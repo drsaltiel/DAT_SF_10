@@ -13,23 +13,26 @@ with open('ga_hw_logins.json') as f:
 
 date_data = []
 for login in data[0]:
-	date_object = dt.datetime.strptime(login, '%Y-%m-%d  %X')
+    date_object = dt.datetime.strptime(login, '%Y-%m-%d  %X')
     date_data.append(date_object)
 
 
 
-# conn = sqlite3.connect('hw1.db')
-# c = conn.cursor()
-# c.execute('''CREATE TABLE logins
-#              (year INTEGER, month INTEGER, day INTEGER, hour INTEGER)''')
-# for login in date_data:
-#     c.execute("INSERT INTO logins(year,month,day,hour) VALUES (?,?,?,?)",
-#     	(login.year,login.month,login.day,login.hour))
+conn = sqlite3.connect('hw1.db')
+c = conn.cursor()
+c.execute('''CREATE TABLE logins
+            (year INTEGER, month INTEGER, day INTEGER, hour INTEGER)''')
+for login in date_data:
+    c.execute("INSERT INTO logins(year,month,day,hour) VALUES (?,?,?,?)",
+        (login.year,login.month,login.day,login.hour))
 
-# c.execute('''SELECT  year, month, day, hour, COUNT(*) AS count
-#     FROM logins GROUP BY year, month, day, hour''')
+max_logins = c.execute('''SELECT year,month,day,hour,MAX(count) FROM
+	(SELECT  year, month, day, hour, COUNT(*) AS count
+    FROM logins GROUP BY year, month, day, hour)''')
 
-# c.execute("SELECT * FROM logins WHERE count == MAX(count)")
+max_login_time = max_logins.fetchall()
 
-# conn.commit()
-# conn.close()
+conn.commit()
+conn.close()
+
+print max_login_time
